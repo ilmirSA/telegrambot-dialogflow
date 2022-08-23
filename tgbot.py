@@ -8,12 +8,10 @@ from telegram.ext import Updater
 from google.cloud import dialogflow
 
 
-def echo(update, context):
+def answers_to_questions(update, context):
     language_code = "ru-RU"
     chat_id = update.message.chat_id
     text_message = update.message.text
-
-
 
     text_from_dialogue_flow = detect_intent_texts(
         project_id,
@@ -22,11 +20,27 @@ def echo(update, context):
         language_code
     )
 
+    context.bot.send_message(chat_id=chat_id, text=text_from_dialogue_flow, )
 
-    context.bot.send_message(chat_id=chat_id,text=text_from_dialogue_flow,)
+
+def start(update, context):
+    text_message = 'Здравствуйте'
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
+
+
+def detect_intent_texts(project_id, session_id, text, language_code):
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(project_id, session_id)
+    text_input = dialogflow.TextInput(text=text, language_code=language_code)
+    query_input = dialogflow.QueryInput(text=text_input)
+    response = session_client.detect_intent(
+        request={"session": session, "query_input": query_input}
+    )
+    return response.query_result.fulfillment_text
 
 def create_intent(project_id, display_name, training_phrases_parts, message_texts):
     """Create an intent of the given intent type."""
+
 
     intents_client = dialogflow.IntentsClient()
 
@@ -53,24 +67,6 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 
 
 
-
-def start(update, context):
-    text_message = 'Здравствуйте'
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
-
-
-def detect_intent_texts(project_id, session_id, text, language_code):
-    session_client = dialogflow.SessionsClient()
-    session = session_client.session_path(project_id, session_id)
-    text_input = dialogflow.TextInput(text=text, language_code=language_code)
-    query_input = dialogflow.QueryInput(text=text_input)
-    response = session_client.detect_intent(
-        request={"session": session, "query_input": query_input}
-    )
-    return response.query_result.fulfillment_text
-
-
-
 if __name__ == '__main__':
     load_dotenv()
     tg_token = os.getenv('TG_TOKEN')
@@ -78,29 +74,25 @@ if __name__ == '__main__':
     with open(google_application_credentials, "r", encoding="UTF-8", ) as my_file:
         file_content = my_file.read()
     google_application_credentials_json = json.loads(file_content)
-    with open('questions.json', "r", encoding="UTF-8", ) as my_file:
-        file_content = my_file.read()
-    questions = json.loads(file_content)
-    q=[]
-    m=[]
-    project_id = google_application_credentials_json.get("project_id")
-    for question in questions:
-        q.extend(questions[question]["questions"])
-        m.append(questions[question]["answer"])
+    project_id=google_application_credentials_json['project_id']
 
-    create_intent(project_id,"Как устроиться к вам на работу",q,m)
-
-
-
-
-
-    #create_intent(project_id,'Как устроиться к вам на работу',questions,'Мой первый истанс')
-    # updater = Updater(token=tg_token, use_context=True)
-    # dispatcher = updater.dispatcher
-    # start_handler = CommandHandler('start', start)
-    # dispatcher.add_handler(start_handler)
-    # echo_handler = MessageHandler(Filters.text, echo)
+    # with open('questions.json', "r", encoding="UTF-8", ) as my_file:
+    #     file_content = my_file.read()
+    # questions = json.loads(file_content)
+    # questions_job= []
+    # answer= []
+    # project_id = google_application_credentials_json.get("project_id")
+    # for question in questions:
+    #     questions_job.extend(questions[question]["questions"])
+    #     answer.append(questions[question]["answer"])
     #
-    #
-    # dispatcher.add_handler(echo_handler)
-    # updater.start_polling()
+    # create_intent(project_id, "Как устроиться к вам на работу", questions_job, answer)
+    updater = Updater(token=tg_token, use_context=True)
+    dispatcher = updater.dispatcher
+    start_handler = CommandHandler('start', start)
+    dispatcher.add_handler(start_handler)
+    answers_to_questions_handler = MessageHandler(Filters.text, answers_to_questions)
+
+
+    dispatcher.add_handler(answers_to_questions_handler)
+    updater.start_polling()
