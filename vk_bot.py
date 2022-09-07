@@ -3,7 +3,8 @@ import logging
 import os
 import random
 
-import vk_api as vk
+import vk
+import vk_api
 from google.cloud import dialogflow
 from telegram.ext import Updater
 from vk_api.longpoll import VkLongPoll, VkEventType
