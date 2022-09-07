@@ -6,7 +6,7 @@ import random
 import vk_api as vk
 from google.cloud import dialogflow
 from telegram.ext import Updater
-from vk.longpoll import VkLongPoll, VkEventType
+from vk_api.longpoll import VkLongPoll, VkEventType
 
 
 class TelegramLogsHandler(logging.Handler):
@@ -53,6 +53,8 @@ if __name__ == "__main__":
 
     tg_chat_id = os.environ['TG_CHAT_ID']
     tg_token = os.environ['TG_TOKEN']
+    # tg_chat_id = os.getenv('TG_CHAT_ID')
+    # tg_token = os.getenv('TG_TOKEN')
     updater = Updater(token=tg_token, use_context=True)
     google_application_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     with open(google_application_credentials, "r", encoding="UTF-8", ) as my_file:
