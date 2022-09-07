@@ -3,11 +3,10 @@ import logging
 import os
 import random
 
-import vk
-import vk_api
+import vk_api as vk
 from google.cloud import dialogflow
 from telegram.ext import Updater
-from vk_api.longpoll import VkLongPoll, VkEventType
+from vk.longpoll import VkLongPoll, VkEventType
 
 
 class TelegramLogsHandler(logging.Handler):
@@ -60,16 +59,16 @@ if __name__ == "__main__":
         file_content = my_file.read()
     google_application_credentials_json = json.loads(file_content)
     project_id = google_application_credentials_json['project_id']
-    vk_token = os.getenv('VK_GROUP_TOKEN')
+    vk_token = os.environ['VK_GROUP_TOKEN']
     vk_session = vk.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
-    longpoll = VkLongPoll(vk_session)
+    long_poll = VkLongPoll(vk_session)
     logger = logging.getLogger('Logger')
     logger.setLevel(logging.WARNING)
     logger.addHandler(TelegramLogsHandler(updater, tg_chat_id))
     updater.start_polling()
 
-    for event in longpoll.listen():
+    for event in long_poll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             text_from_dialogflow = detect_intent_texts(project_id, event.user_id, event.text, 'ru-RU')
             answers_the_questions(text_from_dialogflow, vk_api)
