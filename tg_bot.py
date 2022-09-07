@@ -91,6 +91,7 @@ if __name__ == '__main__':
         file_content = my_file.read()
     google_application_credentials_json = json.loads(file_content)
     project_id = google_application_credentials_json['project_id']
+    print(project_id)
 
     # with open('questions.json', "r", encoding="UTF-8", ) as my_file:
     #     file_content = my_file.read()
