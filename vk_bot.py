@@ -4,7 +4,6 @@ import os
 import random
 
 import vk_api as vk
-from dotenv import load_dotenv
 from google.cloud import dialogflow
 from telegram.ext import Updater
 from vk_api.longpoll import VkLongPoll, VkEventType
@@ -51,9 +50,9 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 
 
 if __name__ == "__main__":
-    load_dotenv()
-    tg_chat_id = '837743097'
-    tg_token = os.getenv('TG_TOKEN')
+
+    tg_chat_id = os.environ['TG_CHAT_ID']
+    tg_token = os.environ['TG_TOKEN']
     updater = Updater(token=tg_token, use_context=True)
     google_application_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     with open(google_application_credentials, "r", encoding="UTF-8", ) as my_file:
