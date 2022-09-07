@@ -2,7 +2,7 @@ import json
 import logging
 import os
 
-from dotenv import load_dotenv
+
 from google.cloud import dialogflow
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
@@ -83,9 +83,9 @@ class TelegramLogsHandler(logging.Handler):
 
 
 if __name__ == '__main__':
-    load_dotenv()
-    tg_chat_id = os.getenv('TG_CHAT_ID')
-    tg_token = os.getenv('TG_TOKEN')
+
+    tg_chat_id = os.environ['TG_CHAT_ID']
+    tg_token = os.environ['TG_TOKEN']
     google_application_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     with open(google_application_credentials, "r", encoding="UTF-8", ) as my_file:
         file_content = my_file.read()
