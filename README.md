@@ -56,7 +56,9 @@ python vk_bot.py
 ![Telegramm bot](/gif/tg.gif "работа бота")
 
 
+
 `VK bot`
+
 ![VK bot](/gif/vk.gif "работа бота")
  
 
