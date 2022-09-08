@@ -52,7 +52,9 @@ python vk_bot.py
 Результат работы ботов.
 
 Telegramm bot 
+
 ![Telegramm bot](/gif/tg.gif "работа бота")
+
 
 
 VK bot 
