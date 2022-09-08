@@ -51,12 +51,12 @@ python vk_bot.py
 ```
 Результат работы ботов.
 
-Telegramm bot 
+`Telegramm bot`
 
 ![Telegramm bot](/gif/tg.gif "работа бота")
 
 
-VK bot 
+`VK bot`
 ![VK bot](/gif/vk.gif "работа бота")
  
 
