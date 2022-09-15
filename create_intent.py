@@ -35,22 +35,19 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 def main():
     load_dotenv()
     google_application_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    with open(google_application_credentials, "r", encoding="UTF-8", ) as my_file:
-        file_content = my_file.read()
-    google_application_credentials_json = json.loads(file_content)
-    project_id = google_application_credentials_json['project_id']
+    with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
+        file_content_json = file.read()
+    google_credentials = json.loads(file_content_json)
+    project_id = google_credentials['project_id']
 
-    with open('questions.json', "r", encoding="UTF-8", ) as my_file:
-        file_content = my_file.read()
-    questions = json.loads(file_content)
-    for question in questions:
-        questions_job = []
-        answer = []
-        q = (questions[question]['questions'])
-        a = (questions[question]['answer'])
-        questions_job.extend(q)
-        answer.append(a)
-        create_intent(project_id, question, questions_job, answer)
+    with open('questions.json', "r", encoding="UTF-8", ) as file:
+        file_content_json = file.read()
+    questions = json.loads(file_content_json)
+    for key, value in questions.items():
+        title = key
+        questions_job = questions.get(key)['questions']
+        answer = [questions.get(key)['answer']]
+        create_intent(project_id, title, questions_job, answer)
 
 
 if __name__ == '__main__':

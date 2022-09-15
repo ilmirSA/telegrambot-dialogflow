@@ -1,29 +1,34 @@
 import json
 import logging
 import os
+from functools import partial
 
-from google.cloud import dialogflow
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
 from telegram.ext import Updater
 
+from dialogflow_api_intent import detect_intent_texts_tg
+from telegramlogshandler import TelegramLogsHandler
 
-def answers_to_questions(update, context):
+logger = logging.getLogger('Logger')
+
+
+def answers_to_questions(project_id, update, context):
+    language_code = "ru-RU"
+    chat_id = update.message.chat_id
+    text_message = update.message.text
     try:
-        language_code = "ru-RU"
-        chat_id = update.message.chat_id
-        text_message = update.message.text
-
-        text_from_dialogue_flow = detect_intent_texts(
+        text_from_dialogue_flow = detect_intent_texts_tg(
             project_id,
             chat_id,
             text_message,
             language_code
+
         )
 
         context.bot.send_message(chat_id=chat_id, text=text_from_dialogue_flow, )
-    except Exception:
-        logger.exception("Бот Упал")
+    except:
+        logger.exception("TG Бот упал")
 
 
 def start(update, context):
@@ -31,44 +36,29 @@ def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_message)
 
 
-def detect_intent_texts(project_id, session_id, text, language_code):
-    session_client = dialogflow.SessionsClient()
-    session = session_client.session_path(project_id, session_id)
-    text_input = dialogflow.TextInput(text=text, language_code=language_code)
-    query_input = dialogflow.QueryInput(text=text_input)
-    response = session_client.detect_intent(
-        request={"session": session, "query_input": query_input}
-    )
-    return response.query_result.fulfillment_text
-
-
-class TelegramLogsHandler(logging.Handler):
-
-    def __init__(self, updater, tg_chat_id):
-        super().__init__()
-        self.tg_chat_id = tg_chat_id
-        self.tg_bot = updater.bot
-
-    def emit(self, record):
-        log_entry = self.format(record)
-        self.tg_bot.send_message(chat_id=self.tg_chat_id, text=log_entry)
-
-
-if __name__ == '__main__':
+def main():
     tg_chat_id = os.environ['TG_CHAT_ID']
     tg_token = os.environ['TG_TOKEN']
-    google_application_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    with open(google_application_credentials, "r", encoding="UTF-8", ) as my_file:
-        file_content = my_file.read()
-    google_application_credentials_json = json.loads(file_content)
-    project_id = google_application_credentials_json['project_id']
+    google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+    with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
+        file_content_json = file.read()
+    google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+    with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
+        file_content_json = file.read()
+    google_credentials = json.loads(file_content_json)
+    project_id = google_credentials['project_id']
+
     updater = Updater(token=tg_token, use_context=True)
     dispatcher = updater.dispatcher
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
-    answers_to_questions_handler = MessageHandler(Filters.text, answers_to_questions)
-    dispatcher.add_handler(answers_to_questions_handler)
-    logger = logging.getLogger('Logger')
+    answers_to_questions_partial = MessageHandler(Filters.text, (partial(answers_to_questions, project_id)))
+
+    dispatcher.add_handler(answers_to_questions_partial)
     logger.setLevel(logging.WARNING)
     logger.addHandler(TelegramLogsHandler(updater, tg_chat_id))
     updater.start_polling()
+
+
+if __name__ == '__main__':
+    main()
