@@ -18,7 +18,7 @@ def answers_to_questions(project_id, update, context):
     chat_id = update.message.chat_id
     text_message = update.message.text
     try:
-        text_from_dialogue_flow = detect_intent_texts_tg(
+        dialogflow_text = detect_intent_texts_tg(
             project_id,
             chat_id,
             text_message,
@@ -26,7 +26,7 @@ def answers_to_questions(project_id, update, context):
 
         )
 
-        context.bot.send_message(chat_id=chat_id, text=text_from_dialogue_flow, )
+        context.bot.send_message(chat_id=chat_id, text=dialogflow_text, )
     except:
         logger.exception("TG Бот упал")
 
@@ -37,11 +37,10 @@ def start(update, context):
 
 
 def main():
+
     tg_chat_id = os.environ['TG_CHAT_ID']
     tg_token = os.environ['TG_TOKEN']
-    google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-    with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
-        file_content_json = file.read()
+
     google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
         file_content_json = file.read()

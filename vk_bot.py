@@ -14,14 +14,14 @@ logger = logging.getLogger('Logger')
 
 
 def answers_the_questions(message, vk_bot, user_id):
-    if not message:
-        pass
-    else:
+    if message:
         vk_bot.messages.send(
             user_id=user_id,
             message=message,
             random_id=random.randint(1, 1000)
         )
+    else:
+        pass
 
 
 def main():
@@ -30,12 +30,14 @@ def main():
         tg_chat_id = os.environ['TG_CHAT_ID']
         tg_token = os.environ['TG_TOKEN']
         google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+
         with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
             file_content_json = file.read()
         google_credentials = json.loads(file_content_json)
         project_id = google_credentials['project_id']
 
         vk_token = os.environ['VK_GROUP_TOKEN']
+
         vk_session = VkApi(token=vk_token)
         vk_api = vk_session.get_api()
         long_poll = VkLongPoll(vk_session)

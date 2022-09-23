@@ -43,11 +43,9 @@ def main():
     with open('questions.json', "r", encoding="UTF-8", ) as file:
         file_content_json = file.read()
     questions = json.loads(file_content_json)
-    for key, value in questions.items():
-        title = key
-        questions_job = questions.get(key)['questions']
-        answer = [questions.get(key)['answer']]
-        create_intent(project_id, title, questions_job, answer)
+    for headline, content in questions.items():
+        answers_and_questions = questions.get(headline)
+        create_intent(project_id, headline, answers_and_questions['questions'], [answers_and_questions['answer']])
 
 
 if __name__ == '__main__':
