@@ -1,7 +1,6 @@
 import json
 import os
 
-from dotenv import load_dotenv
 from google.cloud import dialogflow
 
 
@@ -33,8 +32,9 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 
 
 def main():
-    load_dotenv()
-    google_application_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
+    google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+
     with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
         file_content_json = file.read()
     google_credentials = json.loads(file_content_json)
@@ -43,9 +43,9 @@ def main():
     with open('questions.json', "r", encoding="UTF-8", ) as file:
         file_content_json = file.read()
     questions = json.loads(file_content_json)
-    for headline, content in questions.items():
-        answers_and_questions = questions.get(headline)
-        create_intent(project_id, headline, answers_and_questions['questions'], [answers_and_questions['answer']])
+    for headline, contents in questions.items():
+        content = questions.get(headline)
+        create_intent(project_id, headline, content['questions'], [content['answer']])
 
 
 if __name__ == '__main__':

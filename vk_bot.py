@@ -7,21 +7,18 @@ from telegram.ext import Updater
 from vk_api import VkApi
 from vk_api.longpoll import VkLongPoll, VkEventType
 
-from dialogflow_api_intent import detect_intent_texts_vk
+from dialogflow_api_intent import detect_intent_texts
 from telegramlogshandler import TelegramLogsHandler
 
 logger = logging.getLogger('Logger')
 
 
 def answers_the_questions(message, vk_bot, user_id):
-    if message:
         vk_bot.messages.send(
             user_id=user_id,
             message=message,
             random_id=random.randint(1, 1000)
         )
-    else:
-        pass
 
 
 def main():
@@ -29,6 +26,7 @@ def main():
 
         tg_chat_id = os.environ['TG_CHAT_ID']
         tg_token = os.environ['TG_TOKEN']
+
         google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
 
         with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
@@ -49,8 +47,11 @@ def main():
         try:
             for event in long_poll.listen():
                 if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                    text_from_dialogflow = detect_intent_texts_vk(project_id, event.user_id, event.text, 'ru-RU')
-                    answers_the_questions(text_from_dialogflow, vk_api, event.user_id)
+                    is_fallback,fulfillment_text= detect_intent_texts(project_id, event.user_id, event.text, 'ru-RU')
+                    if is_fallback:
+                        pass
+                    else:
+                        answers_the_questions(fulfillment_text, vk_api, event.user_id)
         except:
             logger.exception("VK Бот упал")
 

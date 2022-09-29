@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
 from telegram.ext import Updater
 
-from dialogflow_api_intent import detect_intent_texts_tg
+from dialogflow_api_intent import detect_intent_texts
 from telegramlogshandler import TelegramLogsHandler
 
 logger = logging.getLogger('Logger')
@@ -18,7 +18,7 @@ def answers_to_questions(project_id, update, context):
     chat_id = update.message.chat_id
     text_message = update.message.text
     try:
-        dialogflow_text = detect_intent_texts_tg(
+        is_fallback,fulfillment_text = detect_intent_texts(
             project_id,
             chat_id,
             text_message,
@@ -26,7 +26,7 @@ def answers_to_questions(project_id, update, context):
 
         )
 
-        context.bot.send_message(chat_id=chat_id, text=dialogflow_text, )
+        context.bot.send_message(chat_id=chat_id, text=fulfillment_text, )
     except:
         logger.exception("TG Бот упал")
 
@@ -40,6 +40,7 @@ def main():
 
     tg_chat_id = os.environ['TG_CHAT_ID']
     tg_token = os.environ['TG_TOKEN']
+
 
     google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
