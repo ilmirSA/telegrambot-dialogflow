@@ -14,11 +14,11 @@ logger = logging.getLogger('Logger')
 
 
 def answers_the_questions(message, vk_bot, user_id):
-        vk_bot.messages.send(
-            user_id=user_id,
-            message=message,
-            random_id=random.randint(1, 1000)
-        )
+    vk_bot.messages.send(
+        user_id=user_id,
+        message=message,
+        random_id=random.randint(1, 1000)
+    )
 
 
 def main():
@@ -26,6 +26,8 @@ def main():
 
         tg_chat_id = os.environ['TG_CHAT_ID']
         tg_token = os.environ['TG_TOKEN']
+
+
 
         google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
 
@@ -47,11 +49,10 @@ def main():
         try:
             for event in long_poll.listen():
                 if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                    is_fallback,fulfillment_text= detect_intent_texts(project_id, event.user_id, event.text, 'ru-RU')
-                    if is_fallback:
-                        pass
-                    else:
+                    is_fallback, fulfillment_text = detect_intent_texts(project_id, event.user_id, event.text, 'ru-RU')
+                    if not is_fallback:
                         answers_the_questions(fulfillment_text, vk_api, event.user_id)
+
         except:
             logger.exception("VK Бот упал")
 

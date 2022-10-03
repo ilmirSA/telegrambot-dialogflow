@@ -35,6 +35,7 @@ def main():
 
     google_application_credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
 
+
     with open(google_application_credentials, "r", encoding="UTF-8", ) as file:
         file_content_json = file.read()
     google_credentials = json.loads(file_content_json)
@@ -44,8 +45,7 @@ def main():
         file_content_json = file.read()
     questions = json.loads(file_content_json)
     for headline, contents in questions.items():
-        content = questions.get(headline)
-        create_intent(project_id, headline, content['questions'], [content['answer']])
+       create_intent(project_id, headline, contents['questions'], [contents['answer']])
 
 
 if __name__ == '__main__':
